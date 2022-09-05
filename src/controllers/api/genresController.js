@@ -1,6 +1,10 @@
+const path = require('path');
 const db = require('../../database/models');
+const sequelize = db.sequelize;
+const { Op } = require("sequelize");
+const moment = require('moment');
 
-module.exports = {
+const genresAPIController = {
     list: (req, res) => {
         db.Genre.findAll()
         .then((genres) => {
@@ -47,5 +51,23 @@ module.exports = {
             }
             res.json(response)
         })
+    },
+    genreMovies: (req, res) => {
+        db.Genre.findByPk(req.params.id,{
+            include: ['movies']
+        })
+        .then(genre => {
+            let respuesta = {
+                meta: {
+                    status: 200,
+                    total: genre.length,
+                    url: '/api/genre/:id/movies'
+                },
+                data: genre
+            }
+            res.json(respuesta);
+        });
     }
 }
+
+module.exports = genresAPIController;
